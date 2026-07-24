@@ -1,6 +1,6 @@
 # widgets QML 组件库
 
-这是一个基于 Qt Quick/QML 的轻量组件库示例项目，当前包含确认弹窗、登录弹窗、加载弹窗、进度条，以及一组可复用的主题和基础控件。
+这是一个基于 Qt Quick/QML 的轻量组件库示例项目，当前包含确认弹窗、登录弹窗、注册弹窗、加载弹窗、进度条，以及一组可复用的主题和基础控件。
 
 项目的核心目标是：组件可以直接放进业务页面使用，同时内部保持统一的主题、布局、弹窗行为和交互风格。
 
@@ -16,6 +16,7 @@ widgets/
 │       ├── AppI18n.qml
 │       ├── CommonDialog.qml
 │       ├── LoginDialog.qml
+│       ├── RegisterDialog.qml
 │       ├── LoadingDialog.qml
 │       ├── ProgressBar.qml
 │       ├── base/
@@ -23,6 +24,7 @@ widgets/
 │       ├── controls/
 │       │   ├── AppButton.qml
 │       │   ├── AppCheckBox.qml
+│       │   ├── AppEyeIcon.qml
 │       │   ├── AppIconButton.qml
 │       │   ├── AppProgressBar.qml
 │       │   ├── AppTextField.qml
@@ -202,6 +204,27 @@ AppIconButton {
     onClicked: popup.close()
 }
 ```
+
+### AppEyeIcon
+
+密码显隐图标，基于 `QtQuick.Shapes` 声明式绘制。它只负责显示眼睛或带斜杠的眼睛，点击逻辑通常放在外层按钮或输入框里。
+
+```qml
+AppEyeIcon {
+    width: 18
+    height: 18
+    color: theme.textMuted
+    crossed: !passwordVisible
+}
+```
+
+关键属性：
+
+| 属性 | 说明 |
+| --- | --- |
+| `crossed` | 是否显示斜杠，常用于表示密码隐藏 |
+| `color` | 图标颜色 |
+| `strokeWidth` | 线条宽度 |
 
 ### AppTextField
 

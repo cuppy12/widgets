@@ -25,7 +25,9 @@ qt_add_qml_module(appwidgets
         qml/components/AppI18n.qml
         qml/components/CommonDialog.qml
         qml/components/LoginDialog.qml
+        qml/components/RegisterDialog.qml
         qml/components/LoadingDialog.qml
+        qml/components/ProgressDialog.qml
         qml/components/ProgressBar.qml
         qml/components/theme/AppTheme.qml
         qml/components/controls/AppButton.qml
