@@ -26,6 +26,13 @@ qt_add_qml_module(appwidgets
         qml/components/LoginDialog.qml
         qml/components/LoadingDialog.qml
         qml/components/ProgressBar.qml
+        qml/components/theme/AppTheme.qml
+        qml/components/controls/AppButton.qml
+        qml/components/controls/AppIconButton.qml
+        qml/components/controls/AppCheckBox.qml
+        qml/components/controls/AppTextField.qml
+        qml/components/controls/AppProgressBar.qml
+        qml/components/base/DialogBase.qml
     RESOURCES
         resources/projects/elements.json
 

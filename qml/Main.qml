@@ -2,12 +2,14 @@ import QtQuick
 import QtQuick.Controls.Basic as Basic
 import QtQuick.Layouts
 import "components"
+import "components/controls"
+import "components/theme"
 
 Basic.ApplicationWindow {
     id: window
 
     width: 760
-    height: 460
+    height: 600
     visible: true
     title: "Dialog Components"
 
@@ -16,9 +18,13 @@ Basic.ApplicationWindow {
     property string loadingStatus: "未加载"
     property real progressValue: 38
 
+    AppTheme {
+        id: theme
+    }
+
     Rectangle {
         anchors.fill: parent
-        color: "#F7F9FC"
+        color: theme.page
     }
 
     ColumnLayout {
@@ -26,17 +32,12 @@ Basic.ApplicationWindow {
         anchors.margins: 24
         spacing: 18
 
-        RowLayout {
+        Text {
             Layout.fillWidth: true
-            spacing: 12
-
-            Text {
-                Layout.fillWidth: true
-                text: "弹窗组件测试"
-                color: "#111827"
-                font.pixelSize: 20
-                font.bold: true
-            }
+            text: "组件库测试页"
+            color: theme.textPrimary
+            font.pixelSize: 20
+            font.bold: true
         }
 
         GridLayout {
@@ -50,9 +51,9 @@ Basic.ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 180
-                radius: 8
-                color: "#FFFFFF"
-                border.color: "#E5E7EB"
+                radius: theme.dialogRadius
+                color: theme.panel
+                border.color: theme.borderLight
                 border.width: 1
 
                 ColumnLayout {
@@ -63,22 +64,20 @@ Basic.ApplicationWindow {
                     Text {
                         Layout.fillWidth: true
                         text: "确认弹窗"
-                        color: "#111827"
+                        color: theme.textPrimary
                         font.pixelSize: 16
                         font.bold: true
                     }
 
                     Text {
                         Layout.fillWidth: true
-                        text: "用于确认危险操作、二次确认、提示用户继续或取消。打开后可拖动标题区移动位置。"
-                        color: "#6B7280"
+                        text: "适合危险操作、二次确认、提示用户继续或取消。标题栏可拖动，宽度可通过 preferredWidth/minDialogWidth/maxDialogWidth 控制。"
+                        color: theme.textMuted
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
                     }
 
-                    Item {
-                        Layout.fillHeight: true
-                    }
+                    Item { Layout.fillHeight: true }
 
                     Text {
                         Layout.fillWidth: true
@@ -88,25 +87,12 @@ Basic.ApplicationWindow {
                         elide: Text.ElideRight
                     }
 
-                    Rectangle {
-                        Layout.preferredWidth: 112
-                        Layout.preferredHeight: 34
-                        radius: 5
-                        color: commonOpenMouse.pressed ? "#0958D9" : (commonOpenMouse.containsMouse ? "#4096FF" : "#1677FF")
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: "打开确认弹窗"
-                            color: "#FFFFFF"
-                            font.pixelSize: 13
-                        }
-
-                        MouseArea {
-                            id: commonOpenMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: commonDialog.open()
-                        }
+                    AppButton {
+                        text: "打开确认弹窗"
+                        type: AppButton.Primary
+                        minimumWidth: 112
+                        controlHeight: 34
+                        onClicked: commonDialog.open()
                     }
                 }
             }
@@ -115,9 +101,9 @@ Basic.ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 180
-                radius: 8
-                color: "#FFFFFF"
-                border.color: "#E5E7EB"
+                radius: theme.dialogRadius
+                color: theme.panel
+                border.color: theme.borderLight
                 border.width: 1
 
                 ColumnLayout {
@@ -128,22 +114,20 @@ Basic.ApplicationWindow {
                     Text {
                         Layout.fillWidth: true
                         text: "登录弹窗"
-                        color: "#111827"
+                        color: theme.textPrimary
                         font.pixelSize: 16
                         font.bold: true
                     }
 
                     Text {
                         Layout.fillWidth: true
-                        text: "用于输入用户名和密码，支持记住登录、错误提示和密码显隐。打开后可拖动标题区移动位置。"
-                        color: "#6B7280"
+                        text: "包含用户名、密码、记住登录、错误提示和密码显隐。对外开放 placeholder、按钮文案和登录信号。"
+                        color: theme.textMuted
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
                     }
 
-                    Item {
-                        Layout.fillHeight: true
-                    }
+                    Item { Layout.fillHeight: true }
 
                     Text {
                         Layout.fillWidth: true
@@ -153,27 +137,14 @@ Basic.ApplicationWindow {
                         elide: Text.ElideRight
                     }
 
-                    Rectangle {
-                        Layout.preferredWidth: 112
-                        Layout.preferredHeight: 34
-                        radius: 5
-                        color: loginOpenMouse.pressed ? "#0958D9" : (loginOpenMouse.containsMouse ? "#4096FF" : "#1677FF")
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: "打开登录弹窗"
-                            color: "#FFFFFF"
-                            font.pixelSize: 13
-                        }
-
-                        MouseArea {
-                            id: loginOpenMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                loginDialog.errorText = "";
-                                loginDialog.open();
-                            }
+                    AppButton {
+                        text: "打开登录弹窗"
+                        type: AppButton.Primary
+                        minimumWidth: 112
+                        controlHeight: 34
+                        onClicked: {
+                            loginDialog.errorText = "";
+                            loginDialog.open();
                         }
                     }
                 }
@@ -183,9 +154,9 @@ Basic.ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 180
-                radius: 8
-                color: "#FFFFFF"
-                border.color: "#E5E7EB"
+                radius: theme.dialogRadius
+                color: theme.panel
+                border.color: theme.borderLight
                 border.width: 1
 
                 ColumnLayout {
@@ -196,22 +167,20 @@ Basic.ApplicationWindow {
                     Text {
                         Layout.fillWidth: true
                         text: "加载弹窗"
-                        color: "#111827"
+                        color: theme.textPrimary
                         font.pixelSize: 16
                         font.bold: true
                     }
 
                     Text {
                         Layout.fillWidth: true
-                        text: "用于页面加载、请求处理、文件解析等等待场景，可显示进度或取消操作。"
-                        color: "#6B7280"
+                        text: "用于页面加载、请求处理、文件解析等等待场景，可显示不确定加载、进度和取消操作。"
+                        color: theme.textMuted
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
                     }
 
-                    Item {
-                        Layout.fillHeight: true
-                    }
+                    Item { Layout.fillHeight: true }
 
                     Text {
                         Layout.fillWidth: true
@@ -221,29 +190,16 @@ Basic.ApplicationWindow {
                         elide: Text.ElideRight
                     }
 
-                    Rectangle {
-                        Layout.preferredWidth: 112
-                        Layout.preferredHeight: 34
-                        radius: 5
-                        color: loadingOpenMouse.pressed ? "#0958D9" : (loadingOpenMouse.containsMouse ? "#4096FF" : "#1677FF")
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: "打开加载弹窗"
-                            color: "#FFFFFF"
-                            font.pixelSize: 13
-                        }
-
-                        MouseArea {
-                            id: loadingOpenMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                loadingDialog.progress = -1;
-                                window.loadingStatus = "加载中";
-                                loadingDialog.open();
-                                loadingCloseTimer.restart();
-                            }
+                    AppButton {
+                        text: "打开加载弹窗"
+                        type: AppButton.Primary
+                        minimumWidth: 112
+                        controlHeight: 34
+                        onClicked: {
+                            loadingDialog.progress = -1;
+                            window.loadingStatus = "加载中";
+                            loadingDialog.open();
+                            loadingCloseTimer.restart();
                         }
                     }
                 }
@@ -253,9 +209,9 @@ Basic.ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 180
-                radius: 8
-                color: "#FFFFFF"
-                border.color: "#E5E7EB"
+                radius: theme.dialogRadius
+                color: theme.panel
+                border.color: theme.borderLight
                 border.width: 1
 
                 ColumnLayout {
@@ -266,15 +222,15 @@ Basic.ApplicationWindow {
                     Text {
                         Layout.fillWidth: true
                         text: "进度条组件"
-                        color: "#111827"
+                        color: theme.textPrimary
                         font.pixelSize: 16
                         font.bold: true
                     }
 
                     Text {
                         Layout.fillWidth: true
-                        text: "支持百分比、状态色、条纹动画和不确定加载态。"
-                        color: "#6B7280"
+                        text: "支持百分比、状态色、条纹动画和不确定加载态，可单独作为组件库控件使用。"
+                        color: theme.textMuted
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
                     }
@@ -306,32 +262,17 @@ Basic.ApplicationWindow {
                         }
                     }
 
-                    Item {
-                        Layout.fillHeight: true
-                    }
+                    Item { Layout.fillHeight: true }
 
-                    Rectangle {
-                        Layout.preferredWidth: 112
-                        Layout.preferredHeight: 34
-                        radius: 5
-                        color: progressOpenMouse.pressed ? "#0958D9" : (progressOpenMouse.containsMouse ? "#4096FF" : "#1677FF")
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: "推进进度"
-                            color: "#FFFFFF"
-                            font.pixelSize: 13
-                        }
-
-                        MouseArea {
-                            id: progressOpenMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                window.progressValue += 17;
-                                if (window.progressValue > 100)
-                                    window.progressValue = 0;
-                            }
+                    AppButton {
+                        text: "推进进度"
+                        type: AppButton.Primary
+                        minimumWidth: 112
+                        controlHeight: 34
+                        onClicked: {
+                            window.progressValue += 17;
+                            if (window.progressValue > 100)
+                                window.progressValue = 0;
                         }
                     }
                 }
