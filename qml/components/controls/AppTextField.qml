@@ -41,15 +41,17 @@ Item {
         anchors.leftMargin: 10
         anchors.verticalCenter: parent.verticalCenter
         visible: root.label.length > 0
+        width: visible ? Math.min(86, implicitWidth) : 0
         text: root.label
         color: theme.textMuted
         font.pixelSize: 12
+        elide: Text.ElideRight
     }
 
     TextInput {
         id: input
         anchors.left: parent.left
-        anchors.leftMargin: root.label.length > 0 ? 46 : 10
+        anchors.leftMargin: root.label.length > 0 ? labelText.width + 20 : 10
         anchors.right: parent.right
         anchors.rightMargin: root.passwordMode && root.revealable ? 40 : 10
         anchors.verticalCenter: parent.verticalCenter
@@ -76,14 +78,37 @@ Item {
         Keys.onEnterPressed: root.accepted()
     }
 
-    AppIconButton {
+    Item {
+        id: revealButton
         anchors.right: parent.right
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         visible: root.passwordMode && root.revealable
-        size: 24
-        text: root.passwordVisible ? "明" : "隐"
-        textColor: theme.textMuted
-        onClicked: root.passwordVisible = !root.passwordVisible
+        width: 24
+        height: 24
+
+        Rectangle {
+            anchors.fill: parent
+            radius: width / 2
+            color: revealMouse.containsMouse ? theme.hoverLight : "transparent"
+        }
+
+        AppEyeIcon {
+            anchors.centerIn: parent
+            width: 18
+            height: 18
+            color: theme.textMuted
+            crossed: !root.passwordVisible
+        }
+
+
+
+        MouseArea {
+            id: revealMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.passwordVisible = !root.passwordVisible
+        }
     }
 }

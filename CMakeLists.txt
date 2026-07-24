@@ -22,6 +22,7 @@ qt_add_qml_module(appwidgets
     URI widgets
     QML_FILES
         qml/Main.qml
+        qml/components/AppI18n.qml
         qml/components/CommonDialog.qml
         qml/components/LoginDialog.qml
         qml/components/LoadingDialog.qml
@@ -31,8 +32,10 @@ qt_add_qml_module(appwidgets
         qml/components/controls/AppIconButton.qml
         qml/components/controls/AppCheckBox.qml
         qml/components/controls/AppTextField.qml
+        qml/components/controls/LanguageSwitch.qml
         qml/components/controls/AppProgressBar.qml
         qml/components/base/DialogBase.qml
+        qml/components/controls/AppEyeIcon.qml
     RESOURCES
         resources/projects/elements.json
 

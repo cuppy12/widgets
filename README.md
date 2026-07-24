@@ -13,6 +13,7 @@ widgets/
 ├── qml/
 │   ├── Main.qml
 │   └── components/
+│       ├── AppI18n.qml
 │       ├── CommonDialog.qml
 │       ├── LoginDialog.qml
 │       ├── LoadingDialog.qml
@@ -24,7 +25,8 @@ widgets/
 │       │   ├── AppCheckBox.qml
 │       │   ├── AppIconButton.qml
 │       │   ├── AppProgressBar.qml
-│       │   └── AppTextField.qml
+│       │   ├── AppTextField.qml
+│       │   └── LanguageSwitch.qml
 │       └── theme/
 │           └── AppTheme.qml
 └── resources/
@@ -36,6 +38,7 @@ widgets/
 - `controls/`：按钮、输入框、勾选框、进度条等基础控件。
 - `base/`：复杂组件的公共骨架，例如弹窗基座。
 - `components/`：对业务更友好的即插即用组件，例如 `CommonDialog`、`LoginDialog`。
+- `AppI18n.qml`：轻量语言状态和翻译字典，用于运行时切换界面语言。
 
 ## 运行项目
 
@@ -123,6 +126,43 @@ Rectangle {
 ## 基础控件
 
 基础控件位于 `qml/components/controls`，适合直接在页面或新组件中复用。
+
+### LanguageSwitch
+
+语言切换控件。它本身只负责显示语言选项和发出选择信号，真正的语言状态建议交给 `AppI18n`。
+
+```qml
+import "components"
+import "components/controls"
+
+AppI18n {
+    id: i18n
+}
+
+LanguageSwitch {
+    currentLanguage: i18n.language
+    languages: i18n.languageOptions
+    label: i18n.t("language.label")
+
+    onLanguageSelected: function(language) {
+        i18n.setLanguage(language);
+    }
+}
+```
+
+关键属性：
+
+| 属性 | 说明 |
+| --- | --- |
+| `currentLanguage` | 当前语言代码，例如 `zh_CN`、`en_US` |
+| `languages` | 语言选项数组，元素格式为 `{ "code": "...", "label": "..." }` |
+| `label` | 左侧说明文本 |
+
+信号：
+
+| 信号 | 说明 |
+| --- | --- |
+| `languageSelected(language)` | 用户选择语言时触发 |
 
 ### AppButton
 
@@ -358,8 +398,11 @@ LoginDialog {
     id: loginDialog
     dialogTitle: "登录系统"
     subtitle: "使用你的账号继续"
+    usernameLabel: "用户"
+    passwordLabel: "密码"
     usernamePlaceholder: "请输入用户名"
     passwordPlaceholder: "请输入密码"
+    rememberText: "记住登录"
 
     onLoginRequested: function(username, password, rememberMe) {
         if (username.length === 0 || password.length === 0) {
@@ -415,6 +458,65 @@ LoadingDialog {
 6. 新增 QML 文件后必须更新 `CMakeLists.txt` 的 `QML_FILES`。
 7. 不直接自定义原生 `Button`、`TextField`、`CheckBox` 的 `background/contentItem`，当前项目使用自绘基础控件来避免 native style 兼容问题。
 
+## 语言切换
+
+当前项目使用 `AppI18n.qml` 做轻量运行时语言切换。它包含三个部分：
+
+- `language`：当前语言，例如 `zh_CN`。
+- `languageOptions`：给 `LanguageSwitch` 使用的语言选项。
+- `t(key)`：根据 key 返回当前语言文本。
+
+页面中使用方式：
+
+```qml
+AppI18n {
+    id: i18n
+}
+
+Text {
+    text: i18n.t("page.title")
+}
+
+CommonDialog {
+    dialogTitle: i18n.t("common.dialog.title")
+    message: i18n.t("common.dialog.message")
+    confirmText: i18n.t("common.confirm")
+    cancelText: i18n.t("common.cancel")
+}
+```
+
+切换语言：
+
+```qml
+i18n.setLanguage("en_US")
+```
+
+`setLanguage()` 内部也会同步设置 `Qt.uiLanguage`。这样以后如果迁移到 Qt 官方的 `qsTr()`、`.ts`、`.qm` 翻译流程，可以继续利用 Qt 的运行时语言刷新机制。
+
+添加新文案时，在 `AppI18n.qml` 的 `translations` 中为每种语言补同一个 key：
+
+```qml
+"zh_CN": {
+    "settings.title": "设置"
+},
+"en_US": {
+    "settings.title": "Settings"
+}
+```
+
+建议组件内部只保留默认文案，业务页面需要多语言时从外部传入翻译后的属性值。例如：
+
+```qml
+LoginDialog {
+    dialogTitle: i18n.t("login.dialog.title")
+    usernameLabel: i18n.t("login.username.label")
+    usernamePlaceholder: i18n.t("login.username.placeholder")
+    passwordLabel: i18n.t("login.password.label")
+    passwordPlaceholder: i18n.t("login.password.placeholder")
+    rememberText: i18n.t("login.remember")
+}
+```
+
 ## 常见问题
 
 ### Type unavailable
@@ -436,4 +538,3 @@ qt_add_qml_module(appwidgets
 ### 当前样式不支持自定义控件
 
 如果看到类似 `The current style does not support customization of this control`，通常是自定义了原生 Controls 的 `background` 或 `contentItem`。当前组件库通过 `QtQuick.Controls.Basic as Basic` 和自绘控件规避这个问题。
-

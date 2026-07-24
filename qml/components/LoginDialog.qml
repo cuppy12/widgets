@@ -10,8 +10,11 @@ DialogBase {
     property string dialogTitle: "用户登录"
     property alias username: usernameField.text
     property alias password: passwordField.text
+    property string usernameLabel: "用户"
+    property string passwordLabel: "密码"
     property string usernamePlaceholder: "用户名"
     property string passwordPlaceholder: "密码"
+    property string rememberText: "记住登录"
     property string loginText: "登录"
     property string cancelText: "取消"
     property string errorText: ""
@@ -53,7 +56,7 @@ DialogBase {
         AppTextField {
             id: usernameField
             Layout.fillWidth: true
-            label: "用户"
+            label: root.usernameLabel
             placeholderText: root.usernamePlaceholder
             onAccepted: passwordField.forceInputFocus()
         }
@@ -61,7 +64,7 @@ DialogBase {
         AppTextField {
             id: passwordField
             Layout.fillWidth: true
-            label: "密码"
+            label: root.passwordLabel
             placeholderText: root.passwordPlaceholder
             passwordMode: true
             revealable: true
@@ -70,7 +73,7 @@ DialogBase {
 
         AppCheckBox {
             id: rememberCheck
-            text: "记住登录"
+            text: root.rememberText
         }
 
         Text {

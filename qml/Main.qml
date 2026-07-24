@@ -11,15 +11,27 @@ Basic.ApplicationWindow {
     width: 760
     height: 600
     visible: true
-    title: "Dialog Components"
+    title: i18n.t("app.title")
 
-    property string commonStatus: "未操作"
-    property string loginStatus: "未登录"
-    property string loadingStatus: "未加载"
+    property string commonStatusKey: "status.common.initial"
+    property string loginStatusKey: "status.login.initial"
+    property string loadingStatusKey: "status.loading.initial"
+    property string loginStatusUser: ""
+    property bool loginStatusRemember: false
     property real progressValue: 38
+
+    readonly property string commonStatus: i18n.t(commonStatusKey)
+    readonly property string loadingStatus: i18n.t(loadingStatusKey)
+    readonly property string loginStatus: loginStatusKey === "status.login.submitted"
+                                           ? i18n.t("status.login.submitted") + loginStatusUser + (loginStatusRemember ? i18n.t("status.login.remember") : "")
+                                           : i18n.t(loginStatusKey)
 
     AppTheme {
         id: theme
+    }
+
+    AppI18n {
+        id: i18n
     }
 
     Rectangle {
@@ -32,12 +44,26 @@ Basic.ApplicationWindow {
         anchors.margins: 24
         spacing: 18
 
-        Text {
+        RowLayout {
             Layout.fillWidth: true
-            text: "组件库测试页"
-            color: theme.textPrimary
-            font.pixelSize: 20
-            font.bold: true
+            spacing: 12
+
+            Text {
+                Layout.fillWidth: true
+                text: i18n.t("page.title")
+                color: theme.textPrimary
+                font.pixelSize: 20
+                font.bold: true
+            }
+
+            LanguageSwitch {
+                currentLanguage: i18n.language
+                languages: i18n.languageOptions
+                label: i18n.t("language.label")
+                onLanguageSelected: function(language) {
+                    i18n.setLanguage(language);
+                }
+            }
         }
 
         GridLayout {
@@ -63,7 +89,7 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "确认弹窗"
+                        text: i18n.t("card.common.title")
                         color: theme.textPrimary
                         font.pixelSize: 16
                         font.bold: true
@@ -71,7 +97,7 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "适合危险操作、二次确认、提示用户继续或取消。标题栏可拖动，宽度可通过 preferredWidth/minDialogWidth/maxDialogWidth 控制。"
+                        text: i18n.t("card.common.desc")
                         color: theme.textMuted
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
@@ -81,14 +107,14 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "状态：" + window.commonStatus
+                        text: i18n.t("status.prefix") + window.commonStatus
                         color: "#374151"
                         font.pixelSize: 13
                         elide: Text.ElideRight
                     }
 
                     AppButton {
-                        text: "打开确认弹窗"
+                        text: i18n.t("card.common.open")
                         type: AppButton.Primary
                         minimumWidth: 112
                         controlHeight: 34
@@ -113,7 +139,7 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "登录弹窗"
+                        text: i18n.t("card.login.title")
                         color: theme.textPrimary
                         font.pixelSize: 16
                         font.bold: true
@@ -121,7 +147,7 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "包含用户名、密码、记住登录、错误提示和密码显隐。对外开放 placeholder、按钮文案和登录信号。"
+                        text: i18n.t("card.login.desc")
                         color: theme.textMuted
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
@@ -131,14 +157,14 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "状态：" + window.loginStatus
+                        text: i18n.t("status.prefix") + window.loginStatus
                         color: "#374151"
                         font.pixelSize: 13
                         elide: Text.ElideRight
                     }
 
                     AppButton {
-                        text: "打开登录弹窗"
+                        text: i18n.t("card.login.open")
                         type: AppButton.Primary
                         minimumWidth: 112
                         controlHeight: 34
@@ -166,7 +192,7 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "加载弹窗"
+                        text: i18n.t("card.loading.title")
                         color: theme.textPrimary
                         font.pixelSize: 16
                         font.bold: true
@@ -174,7 +200,7 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "用于页面加载、请求处理、文件解析等等待场景，可显示不确定加载、进度和取消操作。"
+                        text: i18n.t("card.loading.desc")
                         color: theme.textMuted
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
@@ -184,20 +210,20 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "状态：" + window.loadingStatus
+                        text: i18n.t("status.prefix") + window.loadingStatus
                         color: "#374151"
                         font.pixelSize: 13
                         elide: Text.ElideRight
                     }
 
                     AppButton {
-                        text: "打开加载弹窗"
+                        text: i18n.t("card.loading.open")
                         type: AppButton.Primary
                         minimumWidth: 112
                         controlHeight: 34
                         onClicked: {
                             loadingDialog.progress = -1;
-                            window.loadingStatus = "加载中";
+                            window.loadingStatusKey = "status.loading.running";
                             loadingDialog.open();
                             loadingCloseTimer.restart();
                         }
@@ -221,7 +247,7 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "进度条组件"
+                        text: i18n.t("card.progress.title")
                         color: theme.textPrimary
                         font.pixelSize: 16
                         font.bold: true
@@ -229,7 +255,7 @@ Basic.ApplicationWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "支持百分比、状态色、条纹动画和不确定加载态，可单独作为组件库控件使用。"
+                        text: i18n.t("card.progress.desc")
                         color: theme.textMuted
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
@@ -243,14 +269,14 @@ Basic.ApplicationWindow {
                             Layout.fillWidth: true
                             value: window.progressValue
                             striped: true
-                            label: "当前"
+                            label: i18n.t("progress.current")
                         }
 
                         ProgressBar {
                             Layout.fillWidth: true
                             value: 100
                             status: ProgressBar.Success
-                            label: "完成"
+                            label: i18n.t("progress.done")
                         }
 
                         ProgressBar {
@@ -265,7 +291,7 @@ Basic.ApplicationWindow {
                     Item { Layout.fillHeight: true }
 
                     AppButton {
-                        text: "推进进度"
+                        text: i18n.t("card.progress.advance")
                         type: AppButton.Primary
                         minimumWidth: 112
                         controlHeight: 34
@@ -282,26 +308,31 @@ Basic.ApplicationWindow {
 
     CommonDialog {
         id: commonDialog
-        dialogTitle: "确认执行此操作？"
-        message: "这一步会影响当前设备状态，请确认后继续。"
-        confirmText: "确认"
-        cancelText: "取消"
+        dialogTitle: i18n.t("common.dialog.title")
+        message: i18n.t("common.dialog.message")
+        confirmText: i18n.t("common.confirm")
+        cancelText: i18n.t("common.cancel")
         preferredWidth: 320
         maxDialogWidth: 520
         minDialogWidth: 240
         draggable: true
 
-        onConfirmed: window.commonStatus = "已确认"
-        onDenied: window.commonStatus = "已取消"
-        onDismissed: window.commonStatus = "已关闭"
+        onConfirmed: window.commonStatusKey = "status.common.confirmed"
+        onDenied: window.commonStatusKey = "status.common.denied"
+        onDismissed: window.commonStatusKey = "status.common.dismissed"
     }
 
     LoginDialog {
         id: loginDialog
-        dialogTitle: "登录系统"
-        subtitle: "使用你的账号继续"
-        usernamePlaceholder: "请输入用户名"
-        passwordPlaceholder: "请输入密码"
+        dialogTitle: i18n.t("login.dialog.title")
+        subtitle: i18n.t("login.dialog.subtitle")
+        usernameLabel: i18n.t("login.username.label")
+        passwordLabel: i18n.t("login.password.label")
+        usernamePlaceholder: i18n.t("login.username.placeholder")
+        passwordPlaceholder: i18n.t("login.password.placeholder")
+        rememberText: i18n.t("login.remember")
+        loginText: i18n.t("common.confirm")
+        cancelText: i18n.t("common.cancel")
         preferredWidth: 360
         maxDialogWidth: 420
         minDialogWidth: 280
@@ -309,37 +340,40 @@ Basic.ApplicationWindow {
 
         onLoginRequested: function(username, password, rememberMe) {
             if (username.length === 0 || password.length === 0) {
-                errorText = "请输入用户名和密码";
-                window.loginStatus = "等待输入完整信息";
+                errorText = i18n.t("login.error.incomplete");
+                window.loginStatusKey = "status.login.incomplete";
                 return;
             }
 
             errorText = "";
-            window.loginStatus = "已提交：" + username + (rememberMe ? "（记住登录）" : "");
+            window.loginStatusUser = username;
+            window.loginStatusRemember = rememberMe;
+            window.loginStatusKey = "status.login.submitted";
             close();
         }
 
-        onCancelled: window.loginStatus = "已取消"
-        onDismissed: window.loginStatus = "已关闭"
+        onCancelled: window.loginStatusKey = "status.login.cancelled"
+        onDismissed: window.loginStatusKey = "status.login.dismissed"
     }
 
     LoadingDialog {
         id: loadingDialog
-        dialogTitle: "页面加载中"
-        message: "正在加载组件和业务数据，请稍候。"
-        detailText: "示例会在 2.2 秒后自动关闭。"
+        dialogTitle: i18n.t("loading.dialog.title")
+        message: i18n.t("loading.dialog.message")
+        detailText: i18n.t("loading.dialog.detail")
+        cancelText: i18n.t("common.cancel")
         showCancelButton: true
         showCloseButton: true
 
         onCancelled: {
             loadingCloseTimer.stop();
-            window.loadingStatus = "已取消";
+            window.loadingStatusKey = "status.loading.cancelled";
         }
 
         onDismissed: {
             loadingCloseTimer.stop();
-            if (window.loadingStatus === "加载中")
-                window.loadingStatus = "已关闭";
+            if (window.loadingStatusKey === "status.loading.running")
+                window.loadingStatusKey = "status.loading.dismissed";
         }
     }
 
@@ -351,7 +385,7 @@ Basic.ApplicationWindow {
         onTriggered: {
             loadingDialog.actionHandled = true;
             loadingDialog.close();
-            window.loadingStatus = "加载完成";
+            window.loadingStatusKey = "status.loading.done";
         }
     }
 }
