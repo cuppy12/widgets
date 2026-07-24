@@ -1,0 +1,23 @@
+# Qt build outputs
+build/
+build-*/
+*.user
+*.user.*
+*.pro.user
+*.qtc_clangd
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+.qmake.stash
+
+# Generated files
+*.qmlc
+*.jsc
+.rcc/
+
+# Windows / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
