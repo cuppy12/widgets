@@ -66,21 +66,33 @@ Basic.ApplicationWindow {
             }
         }
 
-        GridLayout {
+        Flickable {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            columns: window.width < 620 ? 1 : (window.width < 980 ? 2 : 3)
-            columnSpacing: 16
-            rowSpacing: 16
+            contentWidth: width
+            contentHeight: componentGrid.implicitHeight
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumHeight: 180
-                radius: theme.dialogRadius
-                color: theme.panel
-                border.color: theme.borderLight
-                border.width: 1
+            Basic.ScrollBar.vertical: Basic.ScrollBar {
+                policy: componentGrid.implicitHeight > parent.height ? Basic.ScrollBar.AlwaysOn : Basic.ScrollBar.AsNeeded
+            }
+
+            GridLayout {
+                id: componentGrid
+                width: parent.width
+                columns: window.width < 620 ? 1 : (window.width < 980 ? 2 : 3)
+                columnSpacing: 16
+                rowSpacing: 16
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: 180
+                    radius: theme.dialogRadius
+                    color: theme.panel
+                    border.color: theme.borderLight
+                    border.width: 1
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -121,9 +133,9 @@ Basic.ApplicationWindow {
                         onClicked: commonDialog.open()
                     }
                 }
-            }
+                }
 
-            Rectangle {
+                Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 180
@@ -174,9 +186,9 @@ Basic.ApplicationWindow {
                         }
                     }
                 }
-            }
+                }
 
-            Rectangle {
+                Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 180
@@ -229,9 +241,9 @@ Basic.ApplicationWindow {
                         }
                     }
                 }
-            }
+                }
 
-            Rectangle {
+                Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 180
@@ -274,6 +286,64 @@ Basic.ApplicationWindow {
                             window.progressValue = 0;
                             progressDialog.open();
                             progressDialogTimer.restart();
+                        }
+                    }
+                }
+                }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: 300
+                    radius: theme.dialogRadius
+                    color: theme.panel
+                    border.color: theme.borderLight
+                    border.width: 1
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 18
+                        spacing: 12
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: i18n.t("card.message.title")
+                            color: theme.textPrimary
+                            font.pixelSize: 16
+                            font.bold: true
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: i18n.t("card.message.desc")
+                            color: theme.textMuted
+                            font.pixelSize: 13
+                            wrapMode: Text.WordWrap
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 8
+
+                            AppMessage {
+                                Layout.fillWidth: true
+                                type: AppMessage.Normal
+                                title: i18n.t("message.normal.title")
+                                message: i18n.t("message.normal.text")
+                            }
+
+                            AppMessage {
+                                Layout.fillWidth: true
+                                type: AppMessage.Warning
+                                title: i18n.t("message.warning.title")
+                                message: i18n.t("message.warning.text")
+                            }
+
+                            AppMessage {
+                                Layout.fillWidth: true
+                                type: AppMessage.Error
+                                title: i18n.t("message.error.title")
+                                message: i18n.t("message.error.text")
+                            }
                         }
                     }
                 }
