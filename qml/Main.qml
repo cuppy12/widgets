@@ -26,8 +26,8 @@ Basic.ApplicationWindow {
     property string loginAddedUser: ""
     property string loginStatusDetail: ""
     property bool loginStatusRemember: false
-    property real progressValue: 38
     property var loginBackend: LoginBackend
+    property var progressBackend: ProgressBackend
 
     readonly property var navItems: [
         { "title": i18n.t("card.common.title"), "desc": i18n.t("page.common.summary") },
@@ -54,6 +54,38 @@ Basic.ApplicationWindow {
     readonly property string loginResultMessage: loginStatusKey === "status.login.submitted"
                                                   ? i18n.t("login.result.success.message") + loginStatusUser
                                                   : (loginStatusDetail.length > 0 ? loginStatusDetail : loginStatus)
+
+    function progressStatusType() {
+        if (!progressBackend)
+            return AppProgressBar.Normal;
+        if (progressBackend.state === "completed")
+            return AppProgressBar.Success;
+        if (progressBackend.state === "cancelled")
+            return AppProgressBar.Warning;
+        if (progressBackend.state === "error")
+            return AppProgressBar.Error;
+
+        return AppProgressBar.Normal;
+    }
+
+    function progressMessageType() {
+        if (!progressBackend || progressBackend.state === "idle" || progressBackend.state === "completed")
+            return AppMessage.Normal;
+        if (progressBackend.state === "cancelled")
+            return AppMessage.Warning;
+        if (progressBackend.state === "error")
+            return AppMessage.Error;
+
+        return AppMessage.Normal;
+    }
+
+    function openProgressTask(taskType) {
+        if (!progressBackend)
+            return;
+
+        progressBackend.startTask(taskType);
+        progressDialog.open();
+    }
 
     AppTheme {
         id: theme
@@ -381,31 +413,95 @@ Basic.ApplicationWindow {
                 }
 
                 PageScroll {
-                    DemoPanel {
-                        title: i18n.t("card.progress.title")
-                        badgeText: i18n.t("page.frontend")
-                        description: i18n.t("card.progress.desc")
+                    GridLayout {
+                        Layout.fillWidth: true
+                        columns: width < 760 ? 1 : 2
+                        columnSpacing: 16
+                        rowSpacing: 16
 
-                        AppProgressBar {
-                            Layout.fillWidth: true
-                            minimum: 0
-                            maximum: 100
-                            value: window.progressValue
-                            label: i18n.t("progress.current")
-                            suffix: "%"
-                            barHeight: 8
+                        DemoPanel {
+                            title: i18n.t("progress.frontend.title")
+                            badgeText: i18n.t("page.frontend")
+                            description: i18n.t("card.progress.desc")
+                            Layout.alignment: Qt.AlignTop
+                            Layout.minimumHeight: 320
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: i18n.t("status.prefix") + (window.progressBackend ? i18n.t(window.progressBackend.phaseKey) : i18n.t("progress.phase.idle"))
+                                color: theme.textSecondary
+                                font.pixelSize: 13
+                                elide: Text.ElideRight
+                            }
+
+                            AppMessage {
+                                Layout.fillWidth: true
+                                type: window.progressMessageType()
+                                title: window.progressBackend ? i18n.t(window.progressBackend.taskKey) : i18n.t("progress.task.none")
+                                message: window.progressBackend ? i18n.t(window.progressBackend.detailKey) : i18n.t("progress.detail.idle")
+                            }
+
+                            AppProgressBar {
+                                Layout.fillWidth: true
+                                minimum: window.progressBackend ? window.progressBackend.minimum : 0
+                                maximum: window.progressBackend ? window.progressBackend.maximum : 100
+                                value: window.progressBackend ? window.progressBackend.value : 0
+                                label: i18n.t("progress.current")
+                                suffix: "%"
+                                status: window.progressStatusType()
+                                striped: window.progressBackend ? window.progressBackend.running : false
+                                barHeight: 8
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 88
+                                radius: theme.radiusMedium
+                                color: theme.fieldIdle
+                                border.color: theme.borderLight
+                                border.width: 1
+
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 12
+                                    spacing: 6
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: i18n.t("progress.frontend.flow")
+                                        color: theme.textPrimary
+                                        font.pixelSize: 13
+                                        font.bold: true
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: i18n.t("progress.frontend.note")
+                                        color: theme.textMuted
+                                        font.pixelSize: 12
+                                        lineHeight: 1.15
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                            }
+
+                            AppButton {
+                                text: i18n.t("card.progress.advance")
+                                type: AppButton.Primary
+                                minimumWidth: 128
+                                controlHeight: 34
+                                enabled: !window.progressBackend || !window.progressBackend.running
+                                onClicked: window.openProgressTask("batch")
+                            }
                         }
 
-                        AppButton {
-                            text: i18n.t("card.progress.advance")
-                            type: AppButton.Primary
-                            minimumWidth: 128
-                            controlHeight: 34
-                            onClicked: {
-                                window.progressValue = 0;
-                                progressDialog.open();
-                                progressDialogTimer.restart();
-                            }
+                        ProgressBackendPanel {
+                            backend: window.progressBackend
+                            i18n: i18n
+                            badgeText: i18n.t("page.backend")
+                            Layout.alignment: Qt.AlignTop
+                            Layout.minimumHeight: 320
                         }
                     }
                 }
@@ -541,17 +637,21 @@ Basic.ApplicationWindow {
     ProgressDialog {
         id: progressDialog
         dialogTitle: i18n.t("progress.dialog.title")
-        message: i18n.t("progress.dialog.message")
-        detailText: i18n.language === "en_US" ? "Auto progress demo. Close it when complete." : i18n.t("progress.dialog.detail")
+        message: window.progressBackend ? i18n.t(window.progressBackend.taskKey) : i18n.t("progress.dialog.message")
+        detailText: window.progressBackend ? i18n.t(window.progressBackend.phaseKey) : i18n.t("progress.dialog.detail")
         progressLabel: i18n.t("progress.current")
         cancelText: i18n.t("common.cancel")
         closeText: i18n.t("progress.close")
-        minimum: 0
-        maximum: 100
-        value: window.progressValue
+        minimum: window.progressBackend ? window.progressBackend.minimum : 0
+        maximum: window.progressBackend ? window.progressBackend.maximum : 100
+        value: window.progressBackend ? window.progressBackend.value : 0
+        status: window.progressStatusType()
         striped: true
-        onCancelled: progressDialogTimer.stop()
-        onDismissed: progressDialogTimer.stop()
+        showCancelButton: window.progressBackend ? window.progressBackend.running : false
+        onCancelled: {
+            if (window.progressBackend)
+                window.progressBackend.cancelTask();
+        }
     }
 
     Timer {
@@ -566,15 +666,4 @@ Basic.ApplicationWindow {
         }
     }
 
-    Timer {
-        id: progressDialogTimer
-        interval: 320
-        repeat: true
-
-        onTriggered: {
-            window.progressValue = Math.min(100, window.progressValue + 8);
-            if (window.progressValue >= 100)
-                stop();
-        }
-    }
 }

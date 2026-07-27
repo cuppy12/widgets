@@ -33,6 +33,7 @@ DialogBase {
     readonly property real normalizedValue: Math.max(0, Math.min(1, (value - minimum) / range))
     readonly property int percent: Math.round(normalizedValue * 100)
     readonly property bool completed: !indeterminate && normalizedValue >= 1
+    readonly property bool closeMode: completed || !showCancelButton
 
     signal cancelled()
 
@@ -90,10 +91,10 @@ DialogBase {
 
     footerData: [
         AppButton {
-            text: root.completed ? root.closeText : root.cancelText
+            text: root.closeMode ? root.closeText : root.cancelText
             minimumWidth: 70
             onClicked: {
-                if (root.completed) {
+                if (root.closeMode) {
                     root.actionHandled = true;
                     root.close();
                 } else {

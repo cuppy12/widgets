@@ -18,6 +18,8 @@ qt_add_executable(appwidgets
     main.cpp
     LoginBackend.h
     LoginBackend.cpp
+    ProgressBackend.h
+    ProgressBackend.cpp
 )
 
 qt_add_qml_module(appwidgets
@@ -27,6 +29,7 @@ qt_add_qml_module(appwidgets
         qml/test/DemoPanel.qml
         qml/test/LoginBackendPanel.qml
         qml/test/PageScroll.qml
+        qml/test/ProgressBackendPanel.qml
         qml/components/AppI18n.qml
         qml/components/CommonDialog.qml
         qml/components/LoginDialog.qml
