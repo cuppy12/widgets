@@ -149,6 +149,12 @@ Item {
         id: theme
     }
 
+    TextMetrics {
+        id: labelMetrics
+        text: root.label
+        font.pixelSize: 12
+    }
+
     Rectangle {
         id: fieldFrame
         anchors.left: parent.left
@@ -166,7 +172,7 @@ Item {
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             visible: root.label.length > 0
-            width: visible ? Math.min(86, implicitWidth) : 0
+            width: visible ? Math.min(86, labelMetrics.advanceWidth) : 0
             text: root.label
             color: theme.textMuted
             font.pixelSize: 12

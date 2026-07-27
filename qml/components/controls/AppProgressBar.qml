@@ -46,6 +46,12 @@ Item {
         id: theme
     }
 
+    TextMetrics {
+        id: labelMetrics
+        text: root.label
+        font.pixelSize: 12
+    }
+
     Row {
         anchors.fill: parent
         spacing: showText ? 8 : 0
@@ -53,7 +59,7 @@ Item {
         Text {
             id: labelText
             visible: root.label.length > 0
-            width: visible ? implicitWidth : 0
+            width: visible ? labelMetrics.advanceWidth : 0
             anchors.verticalCenter: parent.verticalCenter
             text: root.label
             color: root.textColor
