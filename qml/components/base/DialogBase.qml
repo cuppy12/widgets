@@ -14,6 +14,12 @@ Basic.Popup {
     property color iconColor: theme.textOnPrimary
     property color iconBackgroundColor: theme.warning
     property int iconSize: 16
+    property int titleFontSize: 16
+    property int subtitleFontSize: 13
+    property int contentPadding: 20
+    property int headerSpacing: 12
+    property int bodySpacing: 12
+    property int footerSpacing: 10
     property int preferredWidth: 320
     property int minDialogWidth: 240
     property int maxDialogWidth: 520
@@ -29,7 +35,7 @@ Basic.Popup {
     readonly property real overlayWidth: parent && parent.width > 0 ? parent.width : naturalWidth + screenMargin * 2
     readonly property real overlayHeight: parent && parent.height > 0 ? parent.height : naturalHeight + screenMargin * 2
     readonly property int naturalWidth: Math.max(minDialogWidth, Math.min(preferredWidth, maxDialogWidth))
-    readonly property real naturalHeight: Math.max(1, panelLayout.implicitHeight + 28)
+    readonly property real naturalHeight: Math.max(1, panelLayout.implicitHeight + contentPadding * 2)
     readonly property real widthScale: Math.max(0.35, (overlayWidth - screenMargin * 2) / naturalWidth)
     readonly property real heightScale: Math.max(0.35, (overlayHeight - screenMargin * 2) / naturalHeight)
     readonly property real contentScale: Math.min(1, widthScale, heightScale)
@@ -126,10 +132,10 @@ Basic.Popup {
 
             Rectangle {
                 anchors.fill: panel
-                anchors.topMargin: 3
+                anchors.topMargin: 7
                 radius: panel.radius
                 color: theme.textPrimary
-                opacity: 0.08
+                opacity: 0.10
             }
 
             Rectangle {
@@ -151,8 +157,8 @@ Basic.Popup {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.top: parent.top
-                    anchors.margins: 14
-                    spacing: theme.spacingMedium
+                    anchors.margins: root.contentPadding
+                    spacing: theme.spacingLarge
 
                     Item {
                         id: header
@@ -178,7 +184,7 @@ Basic.Popup {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.top: parent.top
-                            spacing: 10
+                            spacing: root.headerSpacing
 
                             Rectangle {
                                 visible: root.showIcon
@@ -192,20 +198,20 @@ Basic.Popup {
                                     anchors.centerIn: parent
                                     text: root.iconText
                                     color: root.iconColor
-                                    font.pixelSize: Math.max(10, root.iconSize - 5)
+                                    font.pixelSize: Math.max(12, Math.round(root.iconSize * 0.46))
                                     font.bold: true
                                 }
                             }
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: root.subtitle.length > 0 ? 4 : 0
+                                spacing: root.subtitle.length > 0 ? 5 : 0
 
                                 Text {
                                     Layout.fillWidth: true
                                     text: root.title
                                     color: theme.textPrimary
-                                    font.pixelSize: root.iconSize > 20 ? 16 : 13
+                                    font.pixelSize: root.titleFontSize
                                     font.bold: true
                                     wrapMode: Text.WordWrap
                                 }
@@ -215,17 +221,18 @@ Basic.Popup {
                                     visible: root.subtitle.length > 0
                                     text: root.subtitle
                                     color: theme.textSecondary
-                                    font.pixelSize: 12
+                                    font.pixelSize: root.subtitleFontSize
+                                    lineHeight: 1.18
                                     wrapMode: Text.WordWrap
                                 }
                             }
 
                             AppIconButton {
                                 visible: root.showCloseButton
-                                Layout.preferredWidth: 24
-                                Layout.preferredHeight: 24
+                                Layout.preferredWidth: 28
+                                Layout.preferredHeight: 28
                                 Layout.alignment: Qt.AlignTop
-                                size: 24
+                                size: 28
                                 onClicked: root.closeAsDismissed()
                             }
                         }
@@ -235,7 +242,7 @@ Basic.Popup {
                         id: bodySlot
                         Layout.fillWidth: true
                         visible: children.length > 0
-                        spacing: theme.spacingSmall
+                        spacing: root.bodySpacing
                     }
 
                     Item {
@@ -246,7 +253,7 @@ Basic.Popup {
                         id: footerSlot
                         Layout.alignment: Qt.AlignRight
                         visible: children.length > 0
-                        spacing: theme.spacingSmall
+                        spacing: root.footerSpacing
                     }
                 }
             }

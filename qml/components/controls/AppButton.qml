@@ -13,8 +13,8 @@ Item {
     property string text: ""
     property int type: AppButton.Default
     property bool enabled: true
-    property int minimumWidth: 56
-    property int horizontalPadding: 20
+    property int minimumWidth: 64
+    property int horizontalPadding: 24
     property int controlHeight: theme.controlHeight
 
     readonly property color currentColor: root.type === AppButton.Primary
@@ -47,7 +47,7 @@ Item {
         width: Math.max(0, parent.width - 12)
         text: root.text
         color: root.type === AppButton.Default ? "#374151" : theme.textOnPrimary
-        font.pixelSize: 12
+        font.pixelSize: 13
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

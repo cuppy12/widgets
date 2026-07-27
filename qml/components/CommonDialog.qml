@@ -18,12 +18,15 @@ DialogBase {
 
     title: dialogTitle
     subtitle: message
-    preferredWidth: 320
-    minDialogWidth: 240
-    maxDialogWidth: 520
+    preferredWidth: 360
+    minDialogWidth: 300
+    maxDialogWidth: 460
+    contentPadding: 22
     showIcon: true
     iconText: "!"
-    iconSize: 16
+    iconSize: 22
+    titleFontSize: 16
+    subtitleFontSize: 13
     iconColor: theme.textOnPrimary
     iconBackgroundColor: theme.warning
 
@@ -41,6 +44,8 @@ DialogBase {
     footerData: [
         AppButton {
             text: root.cancelText
+            minimumWidth: 72
+            controlHeight: 34
             onClicked: {
                 root.actionHandled = true;
                 root.denied();
@@ -50,6 +55,8 @@ DialogBase {
         AppButton {
             type: AppButton.Primary
             text: root.confirmText
+            minimumWidth: 72
+            controlHeight: 34
             onClicked: {
                 root.actionHandled = true;
                 root.confirmed();

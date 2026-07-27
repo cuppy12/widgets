@@ -25,9 +25,9 @@ QtObject {
 
     readonly property int radiusSmall: 4
     readonly property int radiusMedium: 6
-    readonly property int dialogRadius: 8
+    readonly property int dialogRadius: 10
     readonly property int dialogMargin: 24
-    readonly property int controlHeight: 30
+    readonly property int controlHeight: 32
     readonly property int fieldHeight: 36
     readonly property int spacingSmall: 8
     readonly property int spacingMedium: 12
