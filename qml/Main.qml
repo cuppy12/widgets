@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import "components"
 import "components/controls"
 import "components/theme"
+import "test"
 
 Basic.ApplicationWindow {
     id: window
@@ -17,14 +18,18 @@ Basic.ApplicationWindow {
     property string loginStatusKey: "status.login.initial"
     property string loadingStatusKey: "status.loading.initial"
     property string loginStatusUser: ""
+    property string loginAddedUser: ""
     property bool loginStatusRemember: false
     property real progressValue: 38
+    property var loginBackend: LoginBackend
 
     readonly property string commonStatus: i18n.t(commonStatusKey)
     readonly property string loadingStatus: i18n.t(loadingStatusKey)
     readonly property string loginStatus: loginStatusKey === "status.login.submitted"
                                            ? i18n.t("status.login.submitted") + loginStatusUser + (loginStatusRemember ? i18n.t("status.login.remember") : "")
-                                           : i18n.t(loginStatusKey)
+                                           : (loginStatusKey === "status.login.userAdded"
+                                              ? i18n.t("status.login.userAdded") + loginAddedUser
+                                              : i18n.t(loginStatusKey))
 
     AppTheme {
         id: theme
@@ -347,6 +352,18 @@ Basic.ApplicationWindow {
                         }
                     }
                 }
+
+                LoginBackendPanel {
+                    backend: window.loginBackend
+                    i18n: i18n
+                    onUserAdded: function(username) {
+                        window.loginAddedUser = username;
+                        window.loginStatusKey = "status.login.userAdded";
+                        Qt.callLater(function() {
+                            loginDialog.selectUser(username);
+                        });
+                    }
+                }
             }
         }
     }
@@ -382,18 +399,19 @@ Basic.ApplicationWindow {
         maxDialogWidth: 420
         minDialogWidth: 280
         draggable: true
-        userOptions: i18n.language === "en_US"
-                     ? ["Operator 01", "Operator 02", "Operator 03", "Engineer", "Maintenance", "Quality Inspector", "Shift Lead", "Admin", "Guest"]
-                     : ["操作员 01", "操作员 02", "操作员 03", "工程师", "维护员", "质检员", "班组长", "管理员", "访客"]
+        userOptions: window.loginBackend.users
         maxVisibleUsers: 5
 
         onLoginRequested: function(username, password, rememberMe) {
-            if (username.length === 0 || password.length === 0) {
-                errorText = i18n.t("login.error.incomplete");
-                window.loginStatusKey = "status.login.incomplete";
+            const result = window.loginBackend.validateLogin(username, password);
+            if (result !== "ok") {
+                loginDialog.actionHandled = false;
+                errorText = i18n.t("login.error." + result);
+                window.loginStatusKey = result === "empty" ? "status.login.incomplete" : "status.login.failed";
                 return;
             }
 
+            loginDialog.actionHandled = true;
             errorText = "";
             window.loginStatusUser = username;
             window.loginStatusRemember = rememberMe;

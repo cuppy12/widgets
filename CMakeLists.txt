@@ -5,7 +5,7 @@ project(widgets VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(QT_QML_GENERATE_QMLLS_INI ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick Qml)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -16,12 +16,15 @@ endif()
 
 qt_add_executable(appwidgets
     main.cpp
+    LoginBackend.h
+    LoginBackend.cpp
 )
 
 qt_add_qml_module(appwidgets
     URI widgets
     QML_FILES
         qml/Main.qml
+        qml/test/LoginBackendPanel.qml
         qml/components/AppI18n.qml
         qml/components/CommonDialog.qml
         qml/components/LoginDialog.qml
@@ -56,7 +59,9 @@ set_target_properties(appwidgets PROPERTIES
 )
 
 target_link_libraries(appwidgets
-    PRIVATE Qt6::Quick
+    PRIVATE
+        Qt6::Quick
+        Qt6::Qml
 )
 
 install(TARGETS appwidgets

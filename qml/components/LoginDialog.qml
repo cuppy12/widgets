@@ -31,8 +31,17 @@ DialogBase {
         passwordField.text = "";
     }
 
+    function selectUser(username) {
+        for (let i = 0; i < usernameBox.modelCount; ++i) {
+            if (usernameBox.resolveText(i) === username) {
+                usernameBox.currentIndex = i;
+                usernameBox.highlightedIndex = i;
+                return;
+            }
+        }
+    }
+
     function submit() {
-        root.actionHandled = true;
         root.loginRequested(usernameBox.currentText, passwordField.text, rememberCheck.checked);
     }
 

@@ -1,11 +1,17 @@
+#include "LoginBackend.h"
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
+    LoginBackend loginBackend;
+
     QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("LoginBackend", &loginBackend);
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,
