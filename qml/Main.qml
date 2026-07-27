@@ -282,32 +282,7 @@ Basic.ApplicationWindow {
                         wrapMode: Text.WordWrap
                     }
 
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 10
 
-                        ProgressBar {
-                            Layout.fillWidth: true
-                            value: window.progressValue
-                            striped: true
-                            label: i18n.t("progress.current")
-                        }
-
-                        ProgressBar {
-                            Layout.fillWidth: true
-                            value: 100
-                            status: ProgressBar.Success
-                            label: i18n.t("progress.done")
-                        }
-
-                        ProgressBar {
-                            Layout.fillWidth: true
-                            indeterminate: true
-                            showText: false
-                            barHeight: 6
-                            progressColor: "#6366F1"
-                        }
-                    }
 
                     Item { Layout.fillHeight: true }
 
@@ -358,6 +333,10 @@ Basic.ApplicationWindow {
         maxDialogWidth: 420
         minDialogWidth: 280
         draggable: true
+        userOptions: i18n.language === "en_US"
+                     ? ["Operator 01", "Operator 02", "Operator 03", "Engineer", "Maintenance", "Quality Inspector", "Shift Lead", "Admin", "Guest"]
+                     : ["操作员 01", "操作员 02", "操作员 03", "工程师", "维护员", "质检员", "班组长", "管理员", "访客"]
+        maxVisibleUsers: 5
 
         onLoginRequested: function(username, password, rememberMe) {
             if (username.length === 0 || password.length === 0) {
@@ -454,7 +433,7 @@ Basic.ApplicationWindow {
         detailText: i18n.language === "en_US" ? "Auto progress demo. Close it when complete." : i18n.t("progress.dialog.detail")
         progressLabel: i18n.t("progress.current")
         cancelText: i18n.t("common.cancel")
-        closeText: i18n.language === "en_US" ? "Close" : "关闭"
+        closeText: i18n.language === "en_US" ? "Close" : "\u5173\u95ed"
         minimum: 0
         maximum: 100
         striped: true

@@ -34,6 +34,7 @@ qt_add_qml_module(appwidgets
         qml/components/controls/AppIconButton.qml
         qml/components/controls/AppCheckBox.qml
         qml/components/controls/AppTextField.qml
+        qml/components/controls/AppComboBox.qml
         qml/components/controls/LanguageSwitch.qml
         qml/components/controls/AppProgressBar.qml
         qml/components/base/DialogBase.qml

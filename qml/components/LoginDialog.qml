@@ -7,16 +7,20 @@ import "theme"
 DialogBase {
     id: root
 
-    property string dialogTitle: "用户登录"
-    property alias username: usernameField.text
+    property string dialogTitle: "Login"
+    readonly property string username: usernameBox.currentText
     property alias password: passwordField.text
-    property string usernameLabel: "用户"
-    property string passwordLabel: "密码"
-    property string usernamePlaceholder: "用户名"
-    property string passwordPlaceholder: "密码"
-    property string rememberText: "记住登录"
-    property string loginText: "登录"
-    property string cancelText: "取消"
+    property var userOptions: []
+    property alias currentUserIndex: usernameBox.currentIndex
+    property int maxVisibleUsers: 5
+    property string usernameLabel: "Account"
+    property string passwordLabel: "Password"
+    property string usernamePlaceholder: "Select account"
+    property string passwordPlaceholder: "Password"
+    property string emptyUserText: "No accounts"
+    property string rememberText: "Remember me"
+    property string loginText: "Login"
+    property string cancelText: "Cancel"
     property string errorText: ""
     property alias rememberMe: rememberCheck.checked
 
@@ -29,21 +33,21 @@ DialogBase {
 
     function submit() {
         root.actionHandled = true;
-        root.loginRequested(usernameField.text, passwordField.text, rememberCheck.checked);
+        root.loginRequested(usernameBox.currentText, passwordField.text, rememberCheck.checked);
     }
 
     title: dialogTitle
-    subtitle: "请输入账号和密码"
+    subtitle: "Select an account and enter the password"
     preferredWidth: 360
     minDialogWidth: 280
     maxDialogWidth: 420
     showIcon: true
-    iconText: "→"
+    iconText: "->"
     iconSize: 34
     iconColor: theme.primary
     iconBackgroundColor: theme.primarySoft
 
-    onOpened: usernameField.forceInputFocus()
+    onOpened: usernameBox.forceInputFocus()
 
     AppTheme {
         id: theme
@@ -53,12 +57,15 @@ DialogBase {
         Layout.fillWidth: true
         spacing: 10
 
-        AppTextField {
-            id: usernameField
+        AppComboBox {
+            id: usernameBox
             Layout.fillWidth: true
             label: root.usernameLabel
             placeholderText: root.usernamePlaceholder
-            onAccepted: passwordField.forceInputFocus()
+            emptyText: root.emptyUserText
+            model: root.userOptions
+            maxVisibleItems: root.maxVisibleUsers
+            onActivated: passwordField.forceInputFocus()
         }
 
         AppTextField {
@@ -68,6 +75,10 @@ DialogBase {
             placeholderText: root.passwordPlaceholder
             passwordMode: true
             revealable: true
+            onInputActiveFocusChanged: {
+                if (inputActiveFocus)
+                    usernameBox.closePopup();
+            }
             onAccepted: root.submit()
         }
 
