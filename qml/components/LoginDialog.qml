@@ -53,6 +53,7 @@ DialogBase {
     showIcon: true
     iconText: "->"
     iconSize: 34
+    closeOnPressOutside: false
     iconColor: theme.primary
     iconBackgroundColor: theme.primarySoft
 

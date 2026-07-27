@@ -5,7 +5,7 @@ project(widgets VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(QT_QML_GENERATE_QMLLS_INI ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Qml)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick Qml)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -24,7 +24,9 @@ qt_add_qml_module(appwidgets
     URI widgets
     QML_FILES
         qml/Main.qml
+        qml/test/DemoPanel.qml
         qml/test/LoginBackendPanel.qml
+        qml/test/PageScroll.qml
         qml/components/AppI18n.qml
         qml/components/CommonDialog.qml
         qml/components/LoginDialog.qml
@@ -44,6 +46,7 @@ qt_add_qml_module(appwidgets
         qml/components/controls/AppEyeIcon.qml
     RESOURCES
         resources/projects/elements.json
+        resources/login/default-users.json
 
 )
 
@@ -60,6 +63,7 @@ set_target_properties(appwidgets PROPERTIES
 
 target_link_libraries(appwidgets
     PRIVATE
+        Qt6::Core
         Qt6::Quick
         Qt6::Qml
 )

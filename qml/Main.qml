@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls.Basic as Basic
 import QtQuick.Layouts
@@ -9,20 +11,31 @@ import "test"
 Basic.ApplicationWindow {
     id: window
 
-    width: 760
-    height: 600
+    width: 1100
+    height: 680
+    minimumWidth: 860
+    minimumHeight: 560
     visible: true
     title: i18n.t("app.title")
 
+    property int currentPage: 1
     property string commonStatusKey: "status.common.initial"
     property string loginStatusKey: "status.login.initial"
     property string loadingStatusKey: "status.loading.initial"
     property string loginStatusUser: ""
     property string loginAddedUser: ""
+    property string loginStatusDetail: ""
     property bool loginStatusRemember: false
     property real progressValue: 38
     property var loginBackend: LoginBackend
 
+    readonly property var navItems: [
+        { "title": i18n.t("card.common.title"), "desc": i18n.t("page.common.summary") },
+        { "title": i18n.t("card.login.title"), "desc": i18n.t("page.login.summary") },
+        { "title": i18n.t("card.loading.title"), "desc": i18n.t("page.loading.summary") },
+        { "title": i18n.t("card.progress.title"), "desc": i18n.t("page.progress.summary") },
+        { "title": i18n.t("card.message.title"), "desc": i18n.t("page.message.summary") }
+    ]
     readonly property string commonStatus: i18n.t(commonStatusKey)
     readonly property string loadingStatus: i18n.t(loadingStatusKey)
     readonly property string loginStatus: loginStatusKey === "status.login.submitted"
@@ -30,6 +43,17 @@ Basic.ApplicationWindow {
                                            : (loginStatusKey === "status.login.userAdded"
                                               ? i18n.t("status.login.userAdded") + loginAddedUser
                                               : i18n.t(loginStatusKey))
+    readonly property bool showLoginResult: loginStatusKey !== "status.login.initial"
+    readonly property string loginResultTitle: loginStatusKey === "status.login.submitted"
+                                                ? i18n.t("login.result.success.title")
+                                                : (loginStatusKey === "status.login.failed"
+                                                   ? i18n.t("login.result.failed.title")
+                                                   : (loginStatusKey === "status.login.userAdded"
+                                                      ? i18n.t("login.result.added.title")
+                                                      : i18n.t("login.result.notice.title")))
+    readonly property string loginResultMessage: loginStatusKey === "status.login.submitted"
+                                                  ? i18n.t("login.result.success.message") + loginStatusUser
+                                                  : (loginStatusDetail.length > 0 ? loginStatusDetail : loginStatus)
 
     AppTheme {
         id: theme
@@ -44,324 +68,392 @@ Basic.ApplicationWindow {
         color: theme.page
     }
 
-    ColumnLayout {
+    RowLayout {
         anchors.fill: parent
-        anchors.margins: 24
+        anchors.margins: 18
         spacing: 18
 
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 12
+        Rectangle {
+            Layout.preferredWidth: 232
+            Layout.fillHeight: true
+            radius: theme.dialogRadius
+            color: theme.panel
+            border.color: theme.borderLight
+            border.width: 1
 
-            Text {
-                Layout.fillWidth: true
-                text: i18n.t("page.title")
-                color: theme.textPrimary
-                font.pixelSize: 20
-                font.bold: true
-            }
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 16
 
-            LanguageSwitch {
-                currentLanguage: i18n.language
-                languages: i18n.languageOptions
-                label: i18n.t("language.label")
-                onLanguageSelected: function(language) {
-                    i18n.setLanguage(language);
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 6
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: i18n.t("page.title")
+                        color: theme.textPrimary
+                        font.pixelSize: 20
+                        font.bold: true
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: i18n.t("page.subtitle")
+                        color: theme.textMuted
+                        font.pixelSize: 12
+                        lineHeight: 1.15
+                        wrapMode: Text.WordWrap
+                    }
+                }
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    Repeater {
+                        model: window.navItems
+
+                        delegate: Rectangle {
+                            id: navDelegate
+
+                            required property int index
+                            required property var modelData
+
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 62
+                            radius: theme.radiusMedium
+                            color: window.currentPage === index ? theme.primarySoft : "transparent"
+                            border.color: window.currentPage === index ? "#BBD7FF" : "transparent"
+                            border.width: 1
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 12
+                                anchors.rightMargin: 10
+                                spacing: 10
+
+                                Rectangle {
+                                    Layout.preferredWidth: 4
+                                    Layout.preferredHeight: 30
+                                    radius: 2
+                                    color: window.currentPage === navDelegate.index ? theme.primary : theme.borderLight
+                                }
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 3
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: navDelegate.modelData.title
+                                        color: window.currentPage === navDelegate.index ? theme.primaryPressed : theme.textPrimary
+                                        font.pixelSize: 14
+                                        font.bold: true
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: navDelegate.modelData.desc
+                                        color: theme.textMuted
+                                        font.pixelSize: 11
+                                        elide: Text.ElideRight
+                                    }
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: window.currentPage = navDelegate.index
+                            }
+                        }
+                    }
+                }
+
+                Item {
+                    Layout.fillHeight: true
+                }
+
+                LanguageSwitch {
+                    Layout.fillWidth: true
+                    currentLanguage: i18n.language
+                    languages: i18n.languageOptions
+                    label: i18n.t("language.label")
+                    onLanguageSelected: function(language) {
+                        i18n.setLanguage(language);
+                    }
                 }
             }
         }
 
-        Flickable {
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            contentWidth: width
-            contentHeight: componentGrid.implicitHeight
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
+            spacing: 14
 
-            Basic.ScrollBar.vertical: Basic.ScrollBar {
-                policy: componentGrid.implicitHeight > parent.height ? Basic.ScrollBar.AlwaysOn : Basic.ScrollBar.AsNeeded
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 12
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 5
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: window.navItems[window.currentPage].title
+                        color: theme.textPrimary
+                        font.pixelSize: 24
+                        font.bold: true
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: window.navItems[window.currentPage].desc
+                        color: theme.textMuted
+                        font.pixelSize: 13
+                        wrapMode: Text.WordWrap
+                    }
+                }
             }
 
-            GridLayout {
-                id: componentGrid
-                width: parent.width
-                columns: window.width < 620 ? 1 : (window.width < 980 ? 2 : 3)
-                columnSpacing: 16
-                rowSpacing: 16
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.minimumHeight: 180
-                    radius: theme.dialogRadius
-                    color: theme.panel
-                    border.color: theme.borderLight
-                    border.width: 1
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 18
-                    spacing: 12
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("card.common.title")
-                        color: theme.textPrimary
-                        font.pixelSize: 16
-                        font.bold: true
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("card.common.desc")
-                        color: theme.textMuted
-                        font.pixelSize: 13
-                        wrapMode: Text.WordWrap
-                    }
-
-                    Item { Layout.fillHeight: true }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("status.prefix") + window.commonStatus
-                        color: "#374151"
-                        font.pixelSize: 13
-                        elide: Text.ElideRight
-                    }
-
-                    AppButton {
-                        text: i18n.t("card.common.open")
-                        type: AppButton.Primary
-                        minimumWidth: 112
-                        controlHeight: 34
-                        onClicked: commonDialog.open()
-                    }
-                }
-                }
-
-                Rectangle {
+            StackLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.minimumHeight: 180
-                radius: theme.dialogRadius
-                color: theme.panel
-                border.color: theme.borderLight
-                border.width: 1
+                currentIndex: window.currentPage
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 18
-                    spacing: 12
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("card.login.title")
-                        color: theme.textPrimary
-                        font.pixelSize: 16
-                        font.bold: true
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("card.login.desc")
-                        color: theme.textMuted
-                        font.pixelSize: 13
-                        wrapMode: Text.WordWrap
-                    }
-
-                    Item { Layout.fillHeight: true }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("status.prefix") + window.loginStatus
-                        color: "#374151"
-                        font.pixelSize: 13
-                        elide: Text.ElideRight
-                    }
-
-                    AppButton {
-                        text: i18n.t("card.login.open")
-                        type: AppButton.Primary
-                        minimumWidth: 112
-                        controlHeight: 34
-                        onClicked: {
-                            loginDialog.errorText = "";
-                            loginDialog.open();
-                        }
-                    }
-                }
-                }
-
-                Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumHeight: 180
-                radius: theme.dialogRadius
-                color: theme.panel
-                border.color: theme.borderLight
-                border.width: 1
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 18
-                    spacing: 12
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("card.loading.title")
-                        color: theme.textPrimary
-                        font.pixelSize: 16
-                        font.bold: true
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("card.loading.desc")
-                        color: theme.textMuted
-                        font.pixelSize: 13
-                        wrapMode: Text.WordWrap
-                    }
-
-                    Item { Layout.fillHeight: true }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("status.prefix") + window.loadingStatus
-                        color: "#374151"
-                        font.pixelSize: 13
-                        elide: Text.ElideRight
-                    }
-
-                    AppButton {
-                        text: i18n.t("card.loading.open")
-                        type: AppButton.Primary
-                        minimumWidth: 112
-                        controlHeight: 34
-                        onClicked: {
-                            loadingDialog.progress = -1;
-                            window.loadingStatusKey = "status.loading.running";
-                            loadingDialog.open();
-                            loadingCloseTimer.restart();
-                        }
-                    }
-                }
-                }
-
-                Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumHeight: 180
-                radius: theme.dialogRadius
-                color: theme.panel
-                border.color: theme.borderLight
-                border.width: 1
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 18
-                    spacing: 12
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("card.progress.title")
-                        color: theme.textPrimary
-                        font.pixelSize: 16
-                        font.bold: true
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("card.progress.desc")
-                        color: theme.textMuted
-                        font.pixelSize: 13
-                        wrapMode: Text.WordWrap
-                    }
-
-
-
-                    Item { Layout.fillHeight: true }
-
-                    AppButton {
-                        text: i18n.t("card.progress.advance")
-                        type: AppButton.Primary
-                        minimumWidth: 112
-                        controlHeight: 34
-                        onClicked: {
-                            window.progressValue = 0;
-                            progressDialog.open();
-                            progressDialogTimer.restart();
-                        }
-                    }
-                }
-                }
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.minimumHeight: 300
-                    radius: theme.dialogRadius
-                    color: theme.panel
-                    border.color: theme.borderLight
-                    border.width: 1
-
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 18
-                        spacing: 12
+                PageScroll {
+                    DemoPanel {
+                        title: i18n.t("card.common.title")
+                        badgeText: i18n.t("page.frontend")
+                        description: i18n.t("card.common.desc")
 
                         Text {
                             Layout.fillWidth: true
-                            text: i18n.t("card.message.title")
-                            color: theme.textPrimary
-                            font.pixelSize: 16
-                            font.bold: true
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: i18n.t("card.message.desc")
-                            color: theme.textMuted
+                            text: i18n.t("status.prefix") + window.commonStatus
+                            color: theme.textSecondary
                             font.pixelSize: 13
-                            wrapMode: Text.WordWrap
+                            elide: Text.ElideRight
                         }
 
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 8
+                        AppButton {
+                            text: i18n.t("card.common.open")
+                            type: AppButton.Primary
+                            minimumWidth: 128
+                            controlHeight: 34
+                            onClicked: commonDialog.open()
+                        }
+                    }
+                }
 
-                            AppMessage {
+                PageScroll {
+                    GridLayout {
+                        Layout.fillWidth: true
+                        columns: width < 760 ? 1 : 2
+                        columnSpacing: 16
+                        rowSpacing: 16
+
+                        DemoPanel {
+                            title: i18n.t("login.frontend.title")
+                            badgeText: i18n.t("page.frontend")
+                            description: i18n.t("card.login.desc")
+                            Layout.alignment: Qt.AlignTop
+                            Layout.minimumHeight: 320
+
+                            Text {
                                 Layout.fillWidth: true
-                                type: AppMessage.Normal
-                                title: i18n.t("message.normal.title")
-                                message: i18n.t("message.normal.text")
+                                text: i18n.t("status.prefix") + window.loginStatus
+                                color: theme.textSecondary
+                                font.pixelSize: 13
+                                elide: Text.ElideRight
                             }
 
                             AppMessage {
                                 Layout.fillWidth: true
-                                type: AppMessage.Warning
-                                title: i18n.t("message.warning.title")
-                                message: i18n.t("message.warning.text")
+                                visible: window.showLoginResult
+                                type: window.loginStatusKey === "status.login.submitted" || window.loginStatusKey === "status.login.userAdded"
+                                      ? AppMessage.Normal
+                                      : (window.loginStatusKey === "status.login.failed" ? AppMessage.Error : AppMessage.Warning)
+                                title: window.loginResultTitle
+                                message: window.loginResultMessage
                             }
 
-                            AppMessage {
+                            Rectangle {
                                 Layout.fillWidth: true
-                                type: AppMessage.Error
-                                title: i18n.t("message.error.title")
-                                message: i18n.t("message.error.text")
+                                Layout.preferredHeight: 88
+                                radius: theme.radiusMedium
+                                color: theme.fieldIdle
+                                border.color: theme.borderLight
+                                border.width: 1
+
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 12
+                                    spacing: 6
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: i18n.t("login.frontend.flow")
+                                        color: theme.textPrimary
+                                        font.pixelSize: 13
+                                        font.bold: true
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: i18n.t("login.frontend.note")
+                                        color: theme.textMuted
+                                        font.pixelSize: 12
+                                        lineHeight: 1.15
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                            }
+
+                            AppButton {
+                                text: i18n.t("card.login.open")
+                                type: AppButton.Primary
+                                minimumWidth: 128
+                                controlHeight: 34
+                                onClicked: {
+                                    loginDialog.errorText = "";
+                                    loginDialog.open();
+                                }
+                            }
+                        }
+
+                        LoginBackendPanel {
+                            backend: window.loginBackend
+                            i18n: i18n
+                            badgeText: i18n.t("page.backend")
+                            Layout.alignment: Qt.AlignTop
+                            Layout.minimumHeight: 320
+                            onUserAdded: function(username) {
+                                window.loginAddedUser = username;
+                                window.loginStatusKey = "status.login.userAdded";
+                                window.loginStatusDetail = i18n.t("login.test.added") + username;
+                                Qt.callLater(function() {
+                                    loginDialog.selectUser(username);
+                                });
+                            }
+                            onUserDeleted: function(username) {
+                                window.loginStatusKey = "status.login.failed";
+                                window.loginStatusDetail = i18n.t("login.delete.done") + username;
                             }
                         }
                     }
                 }
 
-                LoginBackendPanel {
-                    backend: window.loginBackend
-                    i18n: i18n
-                    onUserAdded: function(username) {
-                        window.loginAddedUser = username;
-                        window.loginStatusKey = "status.login.userAdded";
-                        Qt.callLater(function() {
-                            loginDialog.selectUser(username);
-                        });
+                PageScroll {
+                    DemoPanel {
+                        title: i18n.t("card.loading.title")
+                        badgeText: i18n.t("page.frontend")
+                        description: i18n.t("card.loading.desc")
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: i18n.t("status.prefix") + window.loadingStatus
+                            color: theme.textSecondary
+                            font.pixelSize: 13
+                            elide: Text.ElideRight
+                        }
+
+                        AppButton {
+                            text: i18n.t("card.loading.open")
+                            type: AppButton.Primary
+                            minimumWidth: 128
+                            controlHeight: 34
+                            onClicked: {
+                                loadingDialog.progress = -1;
+                                window.loadingStatusKey = "status.loading.running";
+                                loadingDialog.open();
+                                loadingCloseTimer.restart();
+                            }
+                        }
+                    }
+                }
+
+                PageScroll {
+                    DemoPanel {
+                        title: i18n.t("card.progress.title")
+                        badgeText: i18n.t("page.frontend")
+                        description: i18n.t("card.progress.desc")
+
+                        AppProgressBar {
+                            Layout.fillWidth: true
+                            minimum: 0
+                            maximum: 100
+                            value: window.progressValue
+                            label: i18n.t("progress.current")
+                            suffix: "%"
+                            barHeight: 8
+                        }
+
+                        AppButton {
+                            text: i18n.t("card.progress.advance")
+                            type: AppButton.Primary
+                            minimumWidth: 128
+                            controlHeight: 34
+                            onClicked: {
+                                window.progressValue = 0;
+                                progressDialog.open();
+                                progressDialogTimer.restart();
+                            }
+                        }
+                    }
+                }
+
+                PageScroll {
+                    DemoPanel {
+                        title: i18n.t("card.message.title")
+                        badgeText: i18n.t("page.frontend")
+                        description: i18n.t("card.message.desc")
+                        Layout.minimumHeight: 330
+
+                        AppMessage {
+                            id: normalMessageDemo
+                            Layout.fillWidth: true
+                            type: AppMessage.Normal
+                            closable: true
+                            title: i18n.t("message.normal.title")
+                            message: i18n.t("message.normal.text")
+                        }
+
+                        AppMessage {
+                            id: warningMessageDemo
+                            Layout.fillWidth: true
+                            type: AppMessage.Warning
+                            closable: true
+                            title: i18n.t("message.warning.title")
+                            message: i18n.t("message.warning.text")
+                        }
+
+                        AppMessage {
+                            id: errorMessageDemo
+                            Layout.fillWidth: true
+                            type: AppMessage.Error
+                            closable: true
+                            title: i18n.t("message.error.title")
+                            message: i18n.t("message.error.text")
+                        }
+
+                        AppButton {
+                            text: i18n.t("message.restore")
+                            minimumWidth: 96
+                            controlHeight: 32
+                            onClicked: {
+                                normalMessageDemo.reopen();
+                                warningMessageDemo.reopen();
+                                errorMessageDemo.reopen();
+                            }
+                        }
                     }
                 }
             }
@@ -374,9 +466,6 @@ Basic.ApplicationWindow {
         message: i18n.t("common.dialog.message")
         confirmText: i18n.t("common.confirm")
         cancelText: i18n.t("common.cancel")
-        preferredWidth: 320
-        maxDialogWidth: 520
-        minDialogWidth: 240
         draggable: true
 
         onConfirmed: window.commonStatusKey = "status.common.confirmed"
@@ -395,9 +484,6 @@ Basic.ApplicationWindow {
         rememberText: i18n.t("login.remember")
         loginText: i18n.t("common.confirm")
         cancelText: i18n.t("common.cancel")
-        preferredWidth: 360
-        maxDialogWidth: 420
-        minDialogWidth: 280
         draggable: true
         userOptions: window.loginBackend.users
         maxVisibleUsers: 5
@@ -407,6 +493,7 @@ Basic.ApplicationWindow {
             if (result !== "ok") {
                 loginDialog.actionHandled = false;
                 errorText = i18n.t("login.error." + result);
+                window.loginStatusDetail = errorText;
                 window.loginStatusKey = result === "empty" ? "status.login.incomplete" : "status.login.failed";
                 return;
             }
@@ -415,13 +502,21 @@ Basic.ApplicationWindow {
             errorText = "";
             window.loginStatusUser = username;
             window.loginStatusRemember = rememberMe;
+            window.loginStatusDetail = i18n.t("login.result.success.message") + username;
             window.loginStatusKey = "status.login.submitted";
             close();
         }
 
-        onCancelled: window.loginStatusKey = "status.login.cancelled"
-        onDismissed: window.loginStatusKey = "status.login.dismissed"
+        onCancelled: {
+            window.loginStatusDetail = i18n.t("status.login.cancelled");
+            window.loginStatusKey = "status.login.cancelled";
+        }
+        onDismissed: {
+            window.loginStatusDetail = i18n.t("status.login.dismissed");
+            window.loginStatusKey = "status.login.dismissed";
+        }
     }
+
     LoadingDialog {
         id: loadingDialog
         dialogTitle: i18n.t("loading.dialog.title")
@@ -450,9 +545,10 @@ Basic.ApplicationWindow {
         detailText: i18n.language === "en_US" ? "Auto progress demo. Close it when complete." : i18n.t("progress.dialog.detail")
         progressLabel: i18n.t("progress.current")
         cancelText: i18n.t("common.cancel")
-        closeText: i18n.language === "en_US" ? "Close" : "\u5173\u95ed"
+        closeText: i18n.t("progress.close")
         minimum: 0
         maximum: 100
+        value: window.progressValue
         striped: true
         onCancelled: progressDialogTimer.stop()
         onDismissed: progressDialogTimer.stop()

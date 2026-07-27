@@ -1,0 +1,37 @@
+{
+    "schemaVersion": 1,
+    "users": [
+        {
+            "password": "123456",
+            "username": "operator01"
+        },
+        {
+            "password": "123456",
+            "username": "operator03"
+        },
+        {
+            "password": "engineer123",
+            "username": "engineer"
+        },
+        {
+            "password": "maintain123",
+            "username": "maintenance"
+        },
+        {
+            "password": "quality123",
+            "username": "quality"
+        },
+        {
+            "password": "lead123",
+            "username": "shiftLead"
+        },
+        {
+            "password": "guest123",
+            "username": "guest"
+        },
+        {
+            "password": "000000",
+            "username": "nancy"
+        }
+    ]
+}

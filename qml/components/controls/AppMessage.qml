@@ -14,6 +14,7 @@ Item {
     property string title: ""
     property string message: ""
     property bool closable: false
+    property string closeButtonText: "\u00D7"
     property bool showIcon: true
     property string iconText: defaultIconText
     property bool dismissed: false
@@ -46,8 +47,9 @@ Item {
     }
 
     visible: !dismissed
+    clip: true
     implicitWidth: 320
-    implicitHeight: Math.max(58, contentRow.implicitHeight + verticalPadding * 2)
+    implicitHeight: dismissed ? 0 : Math.max(58, contentRow.implicitHeight + verticalPadding * 2)
 
     AppTheme {
         id: theme
@@ -130,21 +132,21 @@ Item {
 
         Item {
             visible: root.closable
-            width: 20
-            height: 20
+            width: 22
+            height: 22
             anchors.verticalCenter: parent.verticalCenter
 
             Rectangle {
                 anchors.fill: parent
-                radius: 10
+                radius: 11
                 color: closeMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.08) : "transparent"
             }
 
             Text {
                 anchors.centerIn: parent
-                text: "x"
+                text: root.closeButtonText
                 color: root.messageColor
-                font.pixelSize: 13
+                font.pixelSize: 16
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }

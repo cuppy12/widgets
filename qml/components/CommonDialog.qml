@@ -27,6 +27,7 @@ DialogBase {
     iconSize: 22
     titleFontSize: 16
     subtitleFontSize: 13
+    closeOnPressOutside: false
     iconColor: theme.textOnPrimary
     iconBackgroundColor: theme.warning
 
