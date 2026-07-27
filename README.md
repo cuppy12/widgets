@@ -16,7 +16,6 @@ widgets/
 │       ├── AppI18n.qml
 │       ├── CommonDialog.qml
 │       ├── LoginDialog.qml
-│       ├── RegisterDialog.qml
 │       ├── LoadingDialog.qml
 │       ├── ProgressBar.qml
 │       ├── base/

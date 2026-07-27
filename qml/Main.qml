@@ -15,11 +15,9 @@ Basic.ApplicationWindow {
 
     property string commonStatusKey: "status.common.initial"
     property string loginStatusKey: "status.login.initial"
-    property string registerStatusKey: "status.register.initial"
     property string loadingStatusKey: "status.loading.initial"
     property string loginStatusUser: ""
     property bool loginStatusRemember: false
-    property string registerStatusUser: ""
     property real progressValue: 38
 
     readonly property string commonStatus: i18n.t(commonStatusKey)
@@ -27,7 +25,6 @@ Basic.ApplicationWindow {
     readonly property string loginStatus: loginStatusKey === "status.login.submitted"
                                            ? i18n.t("status.login.submitted") + loginStatusUser + (loginStatusRemember ? i18n.t("status.login.remember") : "")
                                            : i18n.t(loginStatusKey)
-    readonly property string registerStatus: registerStatusKey === "status.register.submitted" ? i18n.t("status.register.submitted") + registerStatusUser : i18n.t(registerStatusKey)
 
     AppTheme {
         id: theme
@@ -166,14 +163,6 @@ Basic.ApplicationWindow {
                         elide: Text.ElideRight
                     }
 
-                    Text {
-                        Layout.fillWidth: true
-                        text: i18n.t("status.prefix") + window.registerStatus
-                        color: "#374151"
-                        font.pixelSize: 13
-                        elide: Text.ElideRight
-                    }
-
                     AppButton {
                         text: i18n.t("card.login.open")
                         type: AppButton.Primary
@@ -182,16 +171,6 @@ Basic.ApplicationWindow {
                         onClicked: {
                             loginDialog.errorText = "";
                             loginDialog.open();
-                        }
-                    }
-
-                    AppButton {
-                        text: i18n.t("card.register.open")
-                        minimumWidth: 112
-                        controlHeight: 34
-                        onClicked: {
-                            registerDialog.errorText = "";
-                            registerDialog.open();
                         }
                     }
                 }
@@ -355,56 +334,6 @@ Basic.ApplicationWindow {
         onCancelled: window.loginStatusKey = "status.login.cancelled"
         onDismissed: window.loginStatusKey = "status.login.dismissed"
     }
-
-    RegisterDialog {
-        id: registerDialog
-        dialogTitle: i18n.t("register.dialog.title")
-        subtitle: i18n.t("register.dialog.subtitle")
-        usernameLabel: i18n.t("register.username.label")
-        emailLabel: i18n.t("register.email.label")
-        passwordLabel: i18n.t("register.password.label")
-        confirmPasswordLabel: i18n.t("register.confirmPassword.label")
-        usernamePlaceholder: i18n.t("register.username.placeholder")
-        emailPlaceholder: i18n.t("register.email.placeholder")
-        passwordPlaceholder: i18n.t("register.password.placeholder")
-        confirmPasswordPlaceholder: i18n.t("register.confirmPassword.placeholder")
-        agreeText: i18n.t("register.agree")
-        registerText: i18n.t("register.submit")
-        cancelText: i18n.t("common.cancel")
-        preferredWidth: 390
-        maxDialogWidth: 460
-        minDialogWidth: 300
-        draggable: true
-
-        onRegisterRequested: function(username, email, password, confirmPassword, acceptedTerms) {
-            if (username.length === 0 || email.length === 0 || password.length === 0 || confirmPassword.length === 0) {
-                errorText = i18n.t("register.error.incomplete");
-                window.registerStatusKey = "status.register.incomplete";
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                errorText = i18n.t("register.error.passwordMismatch");
-                window.registerStatusKey = "status.register.passwordMismatch";
-                return;
-            }
-
-            if (!acceptedTerms) {
-                errorText = i18n.t("register.error.termsRequired");
-                window.registerStatusKey = "status.register.termsRequired";
-                return;
-            }
-
-            errorText = "";
-            window.registerStatusUser = username;
-            window.registerStatusKey = "status.register.submitted";
-            close();
-        }
-
-        onCancelled: window.registerStatusKey = "status.register.cancelled"
-        onDismissed: window.registerStatusKey = "status.register.dismissed"
-    }
-
     LoadingDialog {
         id: loadingDialog
         dialogTitle: i18n.t("loading.dialog.title")
