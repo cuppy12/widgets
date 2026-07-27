@@ -16,6 +16,7 @@ Basic.Popup {
     property int iconSize: 16
     property int titleFontSize: 16
     property int subtitleFontSize: 13
+    property int titleSubtitleSpacing: 8
     property int contentPadding: 20
     property int headerSpacing: 12
     property int bodySpacing: 12
@@ -205,7 +206,7 @@ Basic.Popup {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: root.subtitle.length > 0 ? 5 : 0
+                                spacing: root.subtitle.length > 0 ? root.titleSubtitleSpacing : 0
 
                                 Text {
                                     Layout.fillWidth: true
