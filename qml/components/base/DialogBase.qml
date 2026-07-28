@@ -20,10 +20,16 @@ Basic.Popup {
     property int contentPadding: 20
     property int headerSpacing: 12
     property int bodySpacing: 12
+    property int bodyHorizontalInset: 0
     property int footerSpacing: 10
+    property int footerHorizontalInset: 0
+    property int footerTopMargin: 0
+    property int footerAlignment: Qt.AlignRight
+    property bool showFooter: true
     property int preferredWidth: 320
     property int minDialogWidth: 240
     property int maxDialogWidth: 520
+    property real preferredAspectRatio: 0
     property int screenMargin: theme.dialogMargin
     property bool showCloseButton: true
     property bool closeOnPressOutside: true
@@ -36,7 +42,9 @@ Basic.Popup {
     readonly property real overlayWidth: parent && parent.width > 0 ? parent.width : naturalWidth + screenMargin * 2
     readonly property real overlayHeight: parent && parent.height > 0 ? parent.height : naturalHeight + screenMargin * 2
     readonly property int naturalWidth: Math.max(minDialogWidth, Math.min(preferredWidth, maxDialogWidth))
-    readonly property real naturalHeight: Math.max(1, panelLayout.implicitHeight + contentPadding * 2)
+    readonly property real contentNaturalHeight: Math.max(1, panelLayout.implicitHeight + contentPadding * 2)
+    readonly property real aspectNaturalHeight: preferredAspectRatio > 0 ? naturalWidth / preferredAspectRatio : 0
+    readonly property real naturalHeight: Math.max(contentNaturalHeight, aspectNaturalHeight)
     readonly property real widthScale: Math.max(0.35, (overlayWidth - screenMargin * 2) / naturalWidth)
     readonly property real heightScale: Math.max(0.35, (overlayHeight - screenMargin * 2) / naturalHeight)
     readonly property real contentScale: Math.min(1, widthScale, heightScale)
@@ -242,6 +250,8 @@ Basic.Popup {
                     ColumnLayout {
                         id: bodySlot
                         Layout.fillWidth: true
+                        Layout.leftMargin: root.bodyHorizontalInset
+                        Layout.rightMargin: root.bodyHorizontalInset
                         visible: children.length > 0
                         spacing: root.bodySpacing
                     }
@@ -252,8 +262,11 @@ Basic.Popup {
 
                     RowLayout {
                         id: footerSlot
-                        Layout.alignment: Qt.AlignRight
-                        visible: children.length > 0
+                        Layout.alignment: root.footerAlignment
+                        Layout.leftMargin: root.footerHorizontalInset
+                        Layout.rightMargin: root.footerHorizontalInset
+                        Layout.topMargin: root.footerTopMargin
+                        visible: root.showFooter && children.length > 0
                         spacing: root.footerSpacing
                     }
                 }

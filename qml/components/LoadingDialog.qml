@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import "base"
@@ -27,9 +29,15 @@ DialogBase {
 
     title: dialogTitle
     subtitle: message
-    preferredWidth: 300
-    minDialogWidth: 220
-    maxDialogWidth: 360
+    preferredWidth: 380
+    minDialogWidth: 300
+    maxDialogWidth: 440
+    contentPadding: 26
+    bodySpacing: 14
+    bodyHorizontalInset: 28
+    titleSubtitleSpacing: 7
+    preferredAspectRatio: 2.05
+    showFooter: showCancelButton
     closeOnPressOutside: false
     modal: true
     dim: true
@@ -39,15 +47,15 @@ DialogBase {
         id: theme
     }
 
-    RowLayout {
+    ColumnLayout {
         Layout.fillWidth: true
         spacing: 12
 
         Item {
             id: spinner
-            Layout.preferredWidth: 42
-            Layout.preferredHeight: 42
-            Layout.alignment: Qt.AlignTop
+            Layout.preferredWidth: 38
+            Layout.preferredHeight: 38
+            Layout.alignment: Qt.AlignHCenter
 
             NumberAnimation on rotation {
                 from: 0
@@ -61,54 +69,48 @@ DialogBase {
                 model: 12
 
                 Rectangle {
+                    required property int index
+
                     width: 5
                     height: 5
                     radius: 2.5
                     color: theme.primary
                     opacity: 0.20 + index * 0.06
-                    x: spinner.width / 2 - width / 2 + Math.cos((index * 30 - 90) * Math.PI / 180) * 16
-                    y: spinner.height / 2 - height / 2 + Math.sin((index * 30 - 90) * Math.PI / 180) * 16
+                    x: spinner.width / 2 - width / 2 + Math.cos((index * 30 - 90) * Math.PI / 180) * 14
+                    y: spinner.height / 2 - height / 2 + Math.sin((index * 30 - 90) * Math.PI / 180) * 14
                 }
             }
         }
 
-        ColumnLayout {
+        Text {
             Layout.fillWidth: true
-            spacing: 8
+            visible: root.detailText.length > 0
+            text: root.detailText
+            color: theme.textMuted
+            font.pixelSize: 12
+            lineHeight: 1.18
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+        }
 
-            Text {
-                Layout.fillWidth: true
-                visible: root.detailText.length > 0
-                text: root.detailText
-                color: theme.textMuted
-                font.pixelSize: 11
-                wrapMode: Text.WordWrap
-            }
-
-            AppProgressBar {
-                Layout.fillWidth: true
-                visible: root.hasProgress
-                minimum: 0
-                maximum: 1
-                value: root.normalizedProgress
-                showText: false
-                barHeight: 6
-            }
+        AppProgressBar {
+            Layout.fillWidth: true
+            visible: root.hasProgress
+            minimum: 0
+            maximum: 1
+            value: root.normalizedProgress
+            showText: false
+            barHeight: 6
         }
     }
 
-    RowLayout {
-        Layout.fillWidth: true
-        visible: root.showCancelButton
-
-        Item {
-            Layout.fillWidth: true
-        }
-
+    footerData: [
         AppButton {
+            visible: root.showCancelButton
             text: root.cancelText
-            minimumWidth: 62
+            minimumWidth: 72
+            controlHeight: 34
             onClicked: root.cancel()
         }
-    }
+    ]
 }

@@ -47,9 +47,15 @@ DialogBase {
 
     title: dialogTitle
     subtitle: "Select an account and enter the password"
-    preferredWidth: 360
-    minDialogWidth: 280
-    maxDialogWidth: 420
+    preferredWidth: 390
+    minDialogWidth: 320
+    maxDialogWidth: 460
+    contentPadding: 28
+    headerSpacing: 14
+    bodySpacing: 18
+    bodyHorizontalInset: 4
+    footerSpacing: 12
+    titleSubtitleSpacing: 7
     showIcon: true
     iconText: "->"
     iconSize: 34
@@ -65,7 +71,7 @@ DialogBase {
 
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: 10
+        spacing: 12
 
         AppComboBox {
             id: usernameBox
@@ -94,11 +100,13 @@ DialogBase {
 
         AppCheckBox {
             id: rememberCheck
+            Layout.topMargin: 2
             text: root.rememberText
         }
 
         Text {
             Layout.fillWidth: true
+            Layout.topMargin: 2
             visible: root.errorText.length > 0
             text: root.errorText
             color: theme.danger
@@ -110,7 +118,8 @@ DialogBase {
     footerData: [
         AppButton {
             text: root.cancelText
-            minimumWidth: 62
+            minimumWidth: 72
+            controlHeight: 34
             onClicked: {
                 root.actionHandled = true;
                 root.cancelled();
@@ -120,7 +129,8 @@ DialogBase {
         AppButton {
             type: AppButton.Primary
             text: root.loginText
-            minimumWidth: 78
+            minimumWidth: 86
+            controlHeight: 34
             onClicked: root.submit()
         }
     ]
