@@ -6,10 +6,6 @@
             "username": "operator01"
         },
         {
-            "password": "123456",
-            "username": "operator03"
-        },
-        {
             "password": "engineer123",
             "username": "engineer"
         },
@@ -26,12 +22,12 @@
             "username": "shiftLead"
         },
         {
-            "password": "guest123",
-            "username": "guest"
+            "password": "666666",
+            "username": "laoliu"
         },
         {
-            "password": "000000",
-            "username": "nancy"
+            "password": "9876543",
+            "username": "xiyangyang"
         }
     ]
 }

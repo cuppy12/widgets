@@ -29,14 +29,14 @@ DialogBase {
 
     title: dialogTitle
     subtitle: message
-    preferredWidth: 380
-    minDialogWidth: 300
-    maxDialogWidth: 440
-    contentPadding: 26
-    bodySpacing: 14
-    bodyHorizontalInset: 28
+    preferredWidth: 320
+    minDialogWidth: 280
+    maxDialogWidth: 360
+    contentPadding: 22
+    bodySpacing: 12
+    bodyHorizontalInset: 8
     titleSubtitleSpacing: 7
-    preferredAspectRatio: 2.05
+    preferredAspectRatio: 2.25
     showFooter: showCancelButton
     closeOnPressOutside: false
     modal: true
@@ -47,15 +47,15 @@ DialogBase {
         id: theme
     }
 
-    ColumnLayout {
+    RowLayout {
         Layout.fillWidth: true
         spacing: 12
 
         Item {
             id: spinner
-            Layout.preferredWidth: 38
-            Layout.preferredHeight: 38
-            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 32
+            Layout.preferredHeight: 32
+            Layout.alignment: Qt.AlignVCenter
 
             NumberAnimation on rotation {
                 from: 0
@@ -76,31 +76,35 @@ DialogBase {
                     radius: 2.5
                     color: theme.primary
                     opacity: 0.20 + index * 0.06
-                    x: spinner.width / 2 - width / 2 + Math.cos((index * 30 - 90) * Math.PI / 180) * 14
-                    y: spinner.height / 2 - height / 2 + Math.sin((index * 30 - 90) * Math.PI / 180) * 14
+                    x: spinner.width / 2 - width / 2 + Math.cos((index * 30 - 90) * Math.PI / 180) * 12
+                    y: spinner.height / 2 - height / 2 + Math.sin((index * 30 - 90) * Math.PI / 180) * 12
                 }
             }
         }
 
-        Text {
+        ColumnLayout {
             Layout.fillWidth: true
-            visible: root.detailText.length > 0
-            text: root.detailText
-            color: theme.textMuted
-            font.pixelSize: 12
-            lineHeight: 1.18
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-        }
+            spacing: 8
 
-        AppProgressBar {
-            Layout.fillWidth: true
-            visible: root.hasProgress
-            minimum: 0
-            maximum: 1
-            value: root.normalizedProgress
-            showText: false
-            barHeight: 6
+            Text {
+                Layout.fillWidth: true
+                visible: root.detailText.length > 0
+                text: root.detailText
+                color: theme.textMuted
+                font.pixelSize: 12
+                lineHeight: 1.18
+                wrapMode: Text.WordWrap
+            }
+
+            AppProgressBar {
+                Layout.fillWidth: true
+                visible: root.hasProgress
+                minimum: 0
+                maximum: 1
+                value: root.normalizedProgress
+                showText: false
+                barHeight: 6
+            }
         }
     }
 

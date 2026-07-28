@@ -42,7 +42,9 @@ Basic.ApplicationWindow {
                                            ? i18n.t("status.login.submitted") + loginStatusUser + (loginStatusRemember ? i18n.t("status.login.remember") : "")
                                            : (loginStatusKey === "status.login.userAdded"
                                               ? i18n.t("status.login.userAdded") + loginAddedUser
-                                              : i18n.t(loginStatusKey))
+                                              : (loginStatusKey === "status.login.userDeleted"
+                                                 ? loginStatusDetail
+                                                 : i18n.t(loginStatusKey)))
     readonly property bool showLoginResult: loginStatusKey !== "status.login.initial"
     readonly property string loginResultTitle: loginStatusKey === "status.login.submitted"
                                                 ? i18n.t("login.result.success.title")
@@ -50,7 +52,9 @@ Basic.ApplicationWindow {
                                                    ? i18n.t("login.result.failed.title")
                                                    : (loginStatusKey === "status.login.userAdded"
                                                       ? i18n.t("login.result.added.title")
-                                                      : i18n.t("login.result.notice.title")))
+                                                      : (loginStatusKey === "status.login.userDeleted"
+                                                         ? i18n.t("login.result.deleted.title")
+                                                         : i18n.t("login.result.notice.title"))))
     readonly property string loginResultMessage: loginStatusKey === "status.login.submitted"
                                                   ? i18n.t("login.result.success.message") + loginStatusUser
                                                   : (loginStatusDetail.length > 0 ? loginStatusDetail : loginStatus)
@@ -376,8 +380,8 @@ Basic.ApplicationWindow {
                                 });
                             }
                             onUserDeleted: function(username) {
-                                window.loginStatusKey = "status.login.failed";
                                 window.loginStatusDetail = i18n.t("login.delete.done") + username;
+                                window.loginStatusKey = "status.login.userDeleted";
                             }
                         }
                     }
